@@ -4,4 +4,3 @@ app = FastAPI()
 
 app.include_router(router)
 
-app.add_api_route
