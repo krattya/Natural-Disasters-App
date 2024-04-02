@@ -1,0 +1,9 @@
+fastapi
+pydantic[email]
+uvicorn[standard]
+sqlmodel
+gunicorn
+asyncpg
+SQLAlchemy
+uuid7
+pymongo[srv]

@@ -1,0 +1,9 @@
+
+stages:
+  - commit
+
+lint: 
+  stage: commit
+  image: node:latest
+  script:
+    - ruff fix .
