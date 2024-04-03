@@ -7,4 +7,4 @@ lint:
   image: python:3.11
   script:
     - pip install ruff 
-    - ruff fix .
+    - ruff check .
