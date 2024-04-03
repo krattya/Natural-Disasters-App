@@ -7,3 +7,6 @@ asyncpg
 SQLAlchemy
 uuid7
 pymongo[srv]
+pydantic_settings
+odmantic
+motor
