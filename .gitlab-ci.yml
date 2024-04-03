@@ -4,6 +4,7 @@ stages:
 
 lint: 
   stage: commit
-  image: node:latest
+  image: python:3.11
   script:
+    - pip install ruff 
     - ruff fix .
