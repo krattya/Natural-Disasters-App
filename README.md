@@ -7,6 +7,7 @@
 ```
 docker-compose -f .\docker-compose.yaml up -d
 ```
+5. Find the Docs at http://localhost:8000/docs
 
 
 
