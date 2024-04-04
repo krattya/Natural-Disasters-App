@@ -1,7 +1,11 @@
 from fastapi import Request, HTTPException, status
 
 
-def get_gdac_alert(alert_id_gdac: str, request: Request):
+def get_all_gdacs_alerts(request: Request):
+    return list(request.app.db["gdacs_events"].find({}, {"_id": 0}))
+
+
+def get_gdacs_alert(alert_id_gdac: str, request: Request):
     data = request.app.db["gdacs_events"].find_one({"id": alert_id_gdac}, {"_id": 0})
     if data:
         return data
