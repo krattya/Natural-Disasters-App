@@ -2,16 +2,15 @@ services:
   api:
     build:
       context: ./fastapi/
-
     volumes:
       - ./fastapi:/app
     ports:
       - 8000:8000
 
+
   collection-services:
     build:
       context: ./collection-services/
-
     volumes:
       - ./collection-services/:/app
 
