@@ -1,0 +1,5 @@
+pydantic[email]
+pymongo[srv]
+pydantic_settings
+feedparser
+requests
