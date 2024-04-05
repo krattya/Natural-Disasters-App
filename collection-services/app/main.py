@@ -19,6 +19,7 @@ def main():
             collector.getData()
 
         print("[x] Sleeping for 10 seconds")
+        #TODO: Map Events to Main Alerts and store in DB
         time.sleep(10000)
 
 
