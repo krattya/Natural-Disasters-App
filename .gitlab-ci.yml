@@ -8,3 +8,8 @@ lint:
   script:
     - pip install ruff 
     - ruff check .
+
+
+# TODO: @Sam add integration test to the pipeline just for the api
+
+
