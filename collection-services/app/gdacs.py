@@ -1,16 +1,16 @@
 from BaseAPI import BaseAPI
 from typing import List
-import requests
+import feedparser
 
 
-class USGOV(BaseAPI):
+class GDACS(BaseAPI):
     _id_key = "id"
 
     def __init__(self, db) -> None:
-        super().__init__(db["usgov_events"])
+        super().__init__(db["gdacs_events"])
 
     def getData(self) -> List:
-        alert_list = self._collectData()["features"]
+        alert_list = self._collectData()
 
         for alert in alert_list:
             if not self.db_collection_manager.event_exists(
@@ -28,9 +28,9 @@ class USGOV(BaseAPI):
         return self._id_key
 
     def _collectData(self):
-        print("[x] Fetching data from USGOV API")
-        response = requests.get(
-            "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson"
-        )
-        data = response.json()
-        return data
+        print("[x] Fetching data from GDACS RSS Feed")
+        gdacs_feed = feedparser.parse("https://www.gdacs.org/xml/rss.xml")
+
+        events = gdacs_feed.entries
+
+        return events
