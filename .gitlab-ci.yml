@@ -1,3 +1,45 @@
+".build_container_image":
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint:
+    - ''
+  variables:
+    DOCKERFILE_LOCATION: unset
+    CONTAINER_NAME: unset
+    TAG_NAME: unset
+  script:
+  - mkdir -p /kaniko/.docker
+  - echo "DOCKERFILE_LOCATION" $DOCKERFILE_LOCATION
+  - echo "CONTAINER_NAME" $CONTAINER_NAME
+  - echo "TAG_NAME" $TAG_NAME
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
+    > /kaniko/.docker/config.json
+  - "if [[ \"$CREATE_LATEST_TAG\" == \"true\" ]];\nthen\n/kaniko/executor --single-snapshot --snapshotMode=redo --use-new-run
+    --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME
+    --destination    $CI_REGISTRY_IMAGE/$CONTAINER_NAME:latest \nelse\n/kaniko/executor --single-snapshot --snapshotMode=redo --use-new-run
+    --context $CI_PROJECT_DIR --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME;\nfi\n"
+
+
+variables:
+  DEVELOPMENT_CONTAINER_NAME: development-container
+  DEVELOPMENT_CONTAINER_TAG: "${CI_COMMIT_SHORT_SHA}"
+  RELEASE_CONTAINER_NAME: release-container
+  RELEASE_CONTAINER_TAG: "${CI_COMMIT_SHORT_SHA}"
+
+
+
+create_development_container_image:
+  stage: commit
+  extends:
+  - ".build_container_image"
+  variables:
+    DOCKERFILE_LOCATION: "$CI_PROJECT_DIR/Dockerfile"
+    CONTAINER_NAME: "$DEVELOPMENT_CONTAINER_NAME"
+    TAG_NAME: "$DEVELOPMENT_CONTAINER_TAG"
+    CREATE_LATEST_TAG: 'true'
+
+
+
 
 stages:
   - commit
@@ -11,5 +53,6 @@ lint:
 
 
 # TODO: @Sam add integration test to the pipeline just for the api
+
 
 
