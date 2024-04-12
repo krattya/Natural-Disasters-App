@@ -50,7 +50,9 @@ integration_testing:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
   script:
-  - PYTHONPATH=. pytest -x --junitxml=report_integration_tests.xml tests/
+  - pip install httpx
+  - pip install -U pytest
+  - PYTHONPATH=. pytest -x --junitxml=report_integration_tests.xml fastapi/tests/
   artifacts:
     reports:
       junit: report_integration_tests.xml
