@@ -33,7 +33,7 @@ create_development_container_image:
   extends:
   - ".build_container_image"
   variables:
-    DOCKERFILE_LOCATION: "$CI_PROJECT_DIR/Dockerfile"
+    DOCKERFILE_LOCATION: "$CI_PROJECT_DIR/fastapi/Dockerfile"
     CONTAINER_NAME: "$DEVELOPMENT_CONTAINER_NAME"
     TAG_NAME: "$DEVELOPMENT_CONTAINER_TAG"
     CREATE_LATEST_TAG: 'true'
