@@ -15,9 +15,9 @@
   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}"
     > /kaniko/.docker/config.json
   - "if [[ \"$CREATE_LATEST_TAG\" == \"true\" ]];\nthen\n/kaniko/executor --single-snapshot  --use-new-run
-    --context $CI_PROJECT_DIR/fastapi --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME
+    --context $CI_PROJECT_DIR/fastapi/ --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME
     --destination    $CI_REGISTRY_IMAGE/$CONTAINER_NAME:latest \nelse\n/kaniko/executor --single-snapshot  --use-new-run
-    --context $CI_PROJECT_DIR/fastapi --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME;\nfi\n"
+    --context $CI_PROJECT_DIR/fastapi/ --dockerfile $DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE/$CONTAINER_NAME:$TAG_NAME;\nfi\n"
 
 
 variables:
