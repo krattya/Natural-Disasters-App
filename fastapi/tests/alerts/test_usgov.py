@@ -10,10 +10,13 @@ def test_get_all():
         response = client.get("/api/v1/alerts/gdacs")
         assert response.status_code == 200
         assert isinstance(response.json(), list)
-        pytest.usgov_id = response.json()[0]["id"]
+        if len(response.json()) > 0:
+            pytest.usgov_id = response.json()[0]["id"]
 
 
 def test_get_one():
+    if pytest.gdacs_id == "":
+        pytest.skip("No usgov alerts found")
     with TestClient(app) as client:
         response = client.get(f"/api/v1/alerts/gdacs/{pytest.usgov_id}/")
         assert response.status_code == 200
