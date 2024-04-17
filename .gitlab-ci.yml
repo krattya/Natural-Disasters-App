@@ -21,41 +21,53 @@
 
 
 variables:
-  DEVELOPMENT_CONTAINER_NAME: development-container
+  DEVELOPMENT_CONTAINER_NAME_API: development-container-api
+  DEVELOPMENT_CONTAINER_NAME_COLLECTION_SERVICE: development-container-api
   DEVELOPMENT_CONTAINER_TAG: "${CI_COMMIT_SHORT_SHA}"
   RELEASE_CONTAINER_NAME: release-container
   RELEASE_CONTAINER_TAG: "${CI_COMMIT_SHORT_SHA}"
 
 
 
-create_development_container_image:
+create_development_container_image_api:
   stage: commit
   extends:
   - ".build_container_image"
   variables:
     DOCKERFILE_LOCATION: "$CI_PROJECT_DIR/fastapi/Dockerfile"
-    CONTAINER_NAME: "$DEVELOPMENT_CONTAINER_NAME"
+    CONTAINER_NAME: "$DEVELOPMENT_CONTAINER_NAME_API"
     TAG_NAME: "$DEVELOPMENT_CONTAINER_TAG"
     CREATE_LATEST_TAG: 'true'
 
+create_development_container_image_collection_service:
+  stage: commit
+  extends:
+  - ".build_container_image"
+  variables:
+    DOCKERFILE_LOCATION: "$CI_PROJECT_DIR/collection-services/Dockerfile"
+    CONTAINER_NAME: "$DEVELOPMENT_CONTAINER_NAME_COLLECTION_SERVICE"
+    TAG_NAME: "$DEVELOPMENT_CONTAINER_TAG"
+    CREATE_LATEST_TAG: 'true'
 
 integration_testing:
   stage: commit
   needs:
-  - create_development_container_image
+  - create_development_container_image_api
+  - create_development_container_image_collection_service
   services:
   - name: mongo:latest
     alias: mongo
     variables:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+  - name: "$CI_REGISTRY_IMAGE/$DEVELOPMENT_CONTAINER_NAME_COLLECTION_SERVICE:$DEVELOPMENT_CONTAINER_TAG"
   script:
   - PYTHONPATH=./fastapi/ pytest -x --junitxml=report_integration_tests.xml fastapi/tests/
   artifacts:
     reports:
       junit: report_integration_tests.xml
   image:
-    name: "$CI_REGISTRY_IMAGE/$DEVELOPMENT_CONTAINER_NAME:$DEVELOPMENT_CONTAINER_TAG"
+    name: "$CI_REGISTRY_IMAGE/$DEVELOPMENT_CONTAINER_NAME_API:$DEVELOPMENT_CONTAINER_TAG"
 
 
 
