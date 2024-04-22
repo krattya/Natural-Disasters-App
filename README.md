@@ -10,7 +10,10 @@ docker-compose -f .\docker-compose.yaml up -d
 5. Find the Docs at http://localhost:8000/docs
 
 
-
+## Testing
+```
+PYTHONPATH=. pytest tests/
+```
 
 ## Notes:
 https://github.com/tiangolo/full-stack-fastapi-template

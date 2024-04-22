@@ -6,6 +6,10 @@ services:
       - ./fastapi:/app
     ports:
       - 8000:8000
+    depends_on:
+      - mongo
+      - collection-services
+      - forecast
 
 
   collection-services:
@@ -13,13 +17,21 @@ services:
       context: ./collection-services/
     volumes:
       - ./collection-services/:/app
+    depends_on:
+      - mongo
 
   
   mongo:
     image: mongo
     restart: always
     ports:
-      - 27017:27017
+      - 27018:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+
+  forecast:
+    build:
+      context: ./forecast/
+    depends_on:
+      - mongo
