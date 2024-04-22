@@ -4,12 +4,13 @@ from usgov import USGOV
 from gdacs import GDACS
 from pymongo import MongoClient
 import time
+from Event import Event
 
 db_connect = MongoClient("mongodb://root:example@mongo:27017/")
 db = db_connect["disaster_information"]
 
 
-dataCollectors: List[BaseAPI] = [USGOV(db=db), GDACS(db=db)]
+dataCollectors: List[BaseAPI] = [USGOV(db=db), GDACS(db=db), Event()]
 
 
 def main():
