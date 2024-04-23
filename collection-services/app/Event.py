@@ -9,9 +9,9 @@ import feedparser
 class Event(BaseAPI):
     _id_key = "id"
 
-    def __init__(self):
-        super().__init__()
-        self.client= MongoClient("mongodb://root:example@mongo:27018/")
+    def __init__(self, db):
+        super().__init__(db["events_db"])
+        self.client = MongoClient("mongodb://root:example@mongo:27018/")
         self.db = ["events_db"]
 
     def getData(self):
@@ -24,7 +24,7 @@ class Event(BaseAPI):
                 print("New event inserted:", json.dumps(event))
             else:
                 print("Event already exists:", json.dumps(event))
-        
+
         return event_list
 
     def getKeyOfId(self) -> str:
@@ -33,9 +33,9 @@ class Event(BaseAPI):
     def is_event_duplicate(self, event):
         existing_event = self.db_collection_manager.find_event(
             {
-                "geo_lat" : event["geo_lat"],
-                "geo_long" : event["geo_long"],
-                "published" : event["published"],
+                "geo_lat": event["geo_lat"],
+                "geo_long": event["geo_long"],
+                "published": event["published"],
             }
         )
         return existing_event is not None
@@ -48,12 +48,11 @@ class Event(BaseAPI):
         print("GDACS data lenght:", len(gdacs_data))
         print("USGS data lenght:", len(usgs_data))
 
-
         combined_data = self._collect_gdacs_data + self._collect_usgs_data
         return combined_data
 
     def _collect_gdacs_data(self):
-        print ("[x] Fetching data from GDACS RSS Feed")
+        print("[x] Fetching data from GDACS RSS Feed")
         gdacs_feed = feedparser.parse("https://www.gdacs.org/xml/rss.xml")
 
         events = gdacs_feed.entries
@@ -75,12 +74,12 @@ class Event(BaseAPI):
                 }
             )
         return gdacs_data
-        
+
     def _collect_usgs_data(self):
-        print ("[x] Fetching data from USGS")
+        print("[x] Fetching data from USGS")
         response = requests.get(
             "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson"
-            )
+        )
         data = response.json()
         usgs_events = data.get("features", [])
 
@@ -105,7 +104,7 @@ class Event(BaseAPI):
                 }
             )
         return usgs_data
-    
+
     def _parse_date(self, date_str):
         date_obj = datetime.strptime(date_str, "%a, %d %b %Y %H:%M:%S %z")
-        return int (date_obj.timestamp())
+        return int(date_obj.timestamp())

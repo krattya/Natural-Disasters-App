@@ -4,7 +4,7 @@ from usgov import USGOV
 from gdacs import GDACS
 from pymongo import MongoClient
 import time
-import Event 
+from Event import Event
 
 db_connect = MongoClient("mongodb://root:example@mongo:27018/")
 db = db_connect["disaster_information"]
