@@ -6,7 +6,7 @@ from pymongo import MongoClient
 import time
 from Event import Event
 
-db_connect = MongoClient("mongodb://root:example@mongo:27018/")
+db_connect = MongoClient("mongodb://root:example@mongo:27017/")
 db = db_connect["disaster_information"]
 
 
