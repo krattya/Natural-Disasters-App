@@ -8,9 +8,9 @@ class DatabaseManager:
     def add_event(self, event):
         self.collection.insert_one(event)
 
-    def update_event(self, event_id, event, key):
+    def update_event(self, event_id, new_event, key):
         # TODO: Implement update event
         # check if event exists
         # check if event is different -> update
         self.collection.delete_one({key: event_id})
-        self.collection.insert_one(event)
+        self.collection.insert_one(new_event)
