@@ -1,77 +1,69 @@
-import requests
-import json
-from datetime import datetime
+import logging
+from pymongo import MongoClient
 from typing import List
 from BaseAPI import BaseAPI
-import feedparser
-import uuid
 
 class Event(BaseAPI):
     _id_key = "id"
-    
+
+    logging.basicConfig(level=logging.INFO)
+
     def __init__(self, db) -> None:
         super().__init__(db["events"])
-
+        self.logger = logging.getLogger(__name__)
 
     def getData(self) -> List:
-        alert_list = self.db_collection_manager.get_all_events()
-
-        for alert in alert_list:
-            if not self.db_collection_manager.event_exists(alert[self._id_key], self._id_key):
-                self._save_data(alert)
+        data = self._collectData()
+        if data:
+            for event_id, event_data in data.items():
+                self.logger.info("Checking event:", event_data)
+                if not self.db_collection_manager.event_exists(event_id, self._id_key):
+                    self.logger.info("Saving event:", event_data)
+                    self._save_data(event_data)  
+                else:
+                    self.logger.info(f"Event with ID {event_id} already exists in the database.")
         else:
-            self.db_collection_manager.update_event(alert[self._id_key], alert, self._id_key)
-    
-        json_data = json.dumps(alert_list)
-        return json_data
-        
-    def generate_unique_id(self):
-        return str(uuid.uuid4())
-    
+            self.logger.info("No events to save.")
+
     def getKeyOfId(self) -> str:
         return self._id_key
     
     def _collectData(self):
-        print("Fetching data from the database...")
-    
-    # Retrieve data from the database for both GDACS and USGS
-        gdacs_data = self.db_collection_manager.get_events_by_source("GDACS")
-        usgs_data = self.db_collection_manager.get_events_by_source("USGS")
+        self.logger.info("Fetching data from the database...")
 
+        # Connect to MongoDB
+        db_connect = MongoClient("mongodb://root:example@mongo:27017/")
+        db = db_connect["disaster_information"]
+        gdacs_collection = db["gdacs_events"]
+        usgs_collection = db["usgov_events"]
 
-    # Parse data from GDACS
-        gdacs_parsed_data = []
+        # Retrieve data from MongoDB
+        gdacs_data = gdacs_collection.find({"source": "gdacs_events"})
+        usgs_data = usgs_collection.find({"source": "usgov_events"})
+
+        # Initialize dictionary to store combined data
+        combined_data = {}
+
+        # Parse GDACS data
         for event in gdacs_data:
-            gdacs_parsed_data.append({
-            "time": event["published"],
-            "geo_lat": event["geo_lat"],
-            "geo_long": event["geo_long"]
-        })
+            event_id = event.get("id")
+            if event_id is not None:
+                if event_id not in combined_data:
+                    key = (event.get("published"), event.get("geo_lat"), event.get("geo_long"))
+                    combined_data[event_id] = {"key": key, "data": event}
+                else:
+                    existing_event = combined_data[event_id]["data"]
+                    existing_event.update(event)
 
-    # Parse data from USGS
-        usgs_parsed_data = []
+        # Parse USGS data
         for event in usgs_data:
-            usgs_parsed_data.append({
-            "time": event["properties"]["time"],
-            "geo_lat": event["geometry"]["coordinates"][1],
-            "geo_long": event["geometry"]["coordinates"][0]
-        })
+            event_id = event.get("id")
+            if event_id is not None:
+                if event_id not in combined_data:
+                    key = (event.get("properties", {}).get("time"), event.get("geometry", {}).get("coordinates", [])[1], event.get("geometry", {}).get("coordinates", [])[0])
+                    combined_data[event_id] = {"key": key, "data": event}
+                else:
+                    existing_event = combined_data[event_id]["data"]
+                    existing_event.update(event)
 
-    # Compare data from both sources
-        for gdacs_event in gdacs_parsed_data:
-            for usgs_event in usgs_parsed_data:
-                if (gdacs_event["time"] == usgs_event["time"] and
-                gdacs_event["geo_lat"] == usgs_event["geo_lat"] and
-                gdacs_event["geo_long"] == usgs_event["geo_long"]):
-                    new_event = {
-                    "_id": self.generate_unique_id(),  
-                    "time": gdacs_event["time"],
-                    "geo_lat": gdacs_event["geo_lat"],
-                  "geo_long": gdacs_event["geo_long"]
-                }
-                self.db_collection_manager.save_event(new_event)
-    
-
-
-
-        
+        return combined_data if combined_data else None
