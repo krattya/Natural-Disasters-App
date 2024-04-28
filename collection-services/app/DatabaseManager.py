@@ -24,5 +24,5 @@ class DatabaseManager:
         return self.collection.find({"source": source})
 
     def save_event(self, event):
-        print(f'Saving Data to collection')
+        print('Saving Data to collection')
         self.collection.insert_one(event)
