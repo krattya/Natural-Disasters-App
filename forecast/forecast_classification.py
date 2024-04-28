@@ -3,6 +3,10 @@ from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 from pymongo import MongoClient
 
+
+# This is just the .py file for Docker - Commented and explained file: .ipynb
+
+
 print("[x] Starting forecast_classification script")
 
 df = pd.read_csv("testdata.csv")
@@ -55,12 +59,8 @@ for i in range(10):
     models["model_" + str(i)] = DecisionTreeClassifier()
     models["model_" + str(i)].fit(X, days["y_" + str(i)])
 
-scores = {}
-for i in range(10):
-    scores["score_" + str(i)] = cross_val_score(
-        models["model_" + str(i)], X, days["y_" + str(i)], scoring="f1"
-    )
-    print(f'F1-Score: {scores["score_"+str(i)].mean()}')
+
+cross_val_score(models["model_0"], X, days["y_0"], scoring="f1")
 
 
 gps = [[-125.046387, 40.522151], [-117.751465, 37.709899]]

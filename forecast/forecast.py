@@ -1,10 +1,12 @@
 import pandas as pd
-import folium
 from sklearn.svm import SVR
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from pymongo import MongoClient
 
+
+# This is just the .py file for Docker - Commented and explained file: .ipynb
+ 
 
 print("[x] Starting forecast script")
 
@@ -16,7 +18,7 @@ filtered_df = filtered_df[filtered_df['Magnitude'] >= 5]
 
 
 aftershock_data = filtered_df.copy()
-for i in range(0,30):
+for i in range(0, 30):
     aftershock_data['day'+str(i)] = pd.Series([None] * len(aftershock_data))
 aftershock_data['overallAftershocks'] = pd.Series([None] * len(aftershock_data))
 
