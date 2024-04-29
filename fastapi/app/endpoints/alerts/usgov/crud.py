@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException, status
 
 
 def get_all_usgov_alerts(request: Request):
-    return list(request.app.db["usgov_events"].find({}, {"_id": 0}))
+    return list(request.app.db["usgov_events"].find({}, {"_id": 0})).limit(1000)
 
 
 def get_usgov_alert(alert_id_usgov: str, request: Request):
