@@ -3,7 +3,6 @@ class DatabaseManager:
         self.collection = collection
 
     def event_exists(self, event_id, key):
-        print(f"Searching for event with ID {event_id} in collection with key {key}")
         event = self.collection.find_one({key: event_id})
         return event is not None
 
@@ -16,7 +15,7 @@ class DatabaseManager:
             self.collection.update_one({key: event_id}, {"$set": new_event_data})
         else:
             self.collection.insert_one(new_event_data)
-    
+
     def get_all_events(self):
         return self.collection.find()
 
@@ -24,5 +23,4 @@ class DatabaseManager:
         return self.collection.find({"source": source})
 
     def save_event(self, event):
-        print('Saving Data to collection')
         self.collection.insert_one(event)

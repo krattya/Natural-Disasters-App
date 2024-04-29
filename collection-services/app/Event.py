@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from typing import List
 from BaseAPI import BaseAPI
 
+
 class Event(BaseAPI):
     _id_key = "id"
 
@@ -19,15 +20,17 @@ class Event(BaseAPI):
                 self.logger.info("Checking event:", event_data)
                 if not self.db_collection_manager.event_exists(event_id, self._id_key):
                     self.logger.info("Saving event:", event_data)
-                    self._save_data(event_data)  
+                    self._save_data(event_data)
                 else:
-                    self.logger.info(f"Event with ID {event_id} already exists in the database.")
+                    self.logger.info(
+                        f"Event with ID {event_id} already exists in the database."
+                    )
         else:
             self.logger.info("No events to save.")
 
     def getKeyOfId(self) -> str:
         return self._id_key
-    
+
     def _collectData(self):
         self.logger.info("Fetching data from the database...")
 
@@ -49,7 +52,11 @@ class Event(BaseAPI):
             event_id = event.get("id")
             if event_id is not None:
                 if event_id not in combined_data:
-                    key = (event.get("published"), event.get("geo_lat"), event.get("geo_long"))
+                    key = (
+                        event.get("published"),
+                        event.get("geo_lat"),
+                        event.get("geo_long"),
+                    )
                     combined_data[event_id] = {"key": key, "data": event}
                 else:
                     existing_event = combined_data[event_id]["data"]
@@ -60,7 +67,11 @@ class Event(BaseAPI):
             event_id = event.get("id")
             if event_id is not None:
                 if event_id not in combined_data:
-                    key = (event.get("properties", {}).get("time"), event.get("geometry", {}).get("coordinates", [])[1], event.get("geometry", {}).get("coordinates", [])[0])
+                    key = (
+                        event.get("properties", {}).get("time"),
+                        event.get("geometry", {}).get("coordinates", [])[1],
+                        event.get("geometry", {}).get("coordinates", [])[0],
+                    )
                     combined_data[event_id] = {"key": key, "data": event}
                 else:
                     existing_event = combined_data[event_id]["data"]
