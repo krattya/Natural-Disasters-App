@@ -2,79 +2,39 @@ import logging
 from pymongo import MongoClient
 from typing import List
 from BaseAPI import BaseAPI
+from pydantic import BaseModel
+
+
+class Event_Mod(BaseModel):
+    gdacs_id: str
+    usgov_id: str
 
 
 class Event(BaseAPI):
     _id_key = "id"
-
-    logging.basicConfig(level=logging.INFO)
+    _db_db = None
 
     def __init__(self, db) -> None:
         super().__init__(db["events"])
-        self.logger = logging.getLogger(__name__)
+        db_connect = MongoClient("mongodb://root:example@mongo:27017/")
+        self._db_db = db_connect["disaster_information"]
+
+    def event_match(self, data1, data2):
+        return True
 
     def getData(self) -> List:
-        data = self._collectData()
-        if data:
-            for event_id, event_data in data.items():
-                self.logger.info("Checking event:", event_data)
-                if not self.db_collection_manager.event_exists(event_id, self._id_key):
-                    self.logger.info("Saving event:", event_data)
-                    self._save_data(event_data)
-                else:
-                    self.logger.info(
-                        f"Event with ID {event_id} already exists in the database."
-                    )
-        else:
-            self.logger.info("No events to save.")
+        print("[x] Creating events from matched data")
+        all_gdacs = self._db_db["gdacs_events"].find({})
+        all_usgov = self._db_db["usgov_events"].find({})
 
-    def getKeyOfId(self) -> str:
-        return self._id_key
+        for gdac in all_gdacs:
+            for usgov in all_usgov:
+                if self.event_macht(gdac, usgov):
+                    event = Event_Mod(gdacs_id=gdac["id"], usgov_id=usgov["id"])
+                    json_event = event.model_dump()
+                    logging.info(f"Event matched: {json_event}")
+                    result = self._db_db["events"].insert_one(json_event)
+                    print(f"Event matched insert id: {result.inserted_id}")
 
     def _collectData(self):
-        self.logger.info("Fetching data from the database...")
-
-        # Connect to MongoDB
-        db_connect = MongoClient("mongodb://root:example@mongo:27017/")
-        db = db_connect["disaster_information"]
-        gdacs_collection = db["gdacs_events"]
-        usgs_collection = db["usgov_events"]
-
-        # Retrieve data from MongoDB
-        gdacs_data = gdacs_collection.find({"source": "gdacs_events"})
-        usgs_data = usgs_collection.find({"source": "usgov_events"})
-
-        # Initialize dictionary to store combined data
-        combined_data = {}
-
-        # Parse GDACS data
-        for event in gdacs_data:
-            event_id = event.get("id")
-            if event_id is not None:
-                if event_id not in combined_data:
-                    key = (
-                        event.get("published"),
-                        event.get("geo_lat"),
-                        event.get("geo_long"),
-                    )
-                    combined_data[event_id] = {"key": key, "data": event}
-                else:
-                    existing_event = combined_data[event_id]["data"]
-                    existing_event.update(event)
-
-        # Parse USGS data
-        for event in usgs_data:
-            event_id = event.get("id")
-            if event_id is not None:
-                if event_id not in combined_data:
-                    key = (
-                        event.get("properties", {}).get("time"),
-                        event.get("geometry", {}).get("coordinates", [])[1],
-                        event.get("geometry", {}).get("coordinates", [])[0],
-                    )
-                    combined_data[event_id] = {"key": key, "data": event}
-                else:
-                    existing_event = combined_data[event_id]["data"]
-                    existing_event.update(event)
-
-        return combined_data if combined_data else None
+        pass
