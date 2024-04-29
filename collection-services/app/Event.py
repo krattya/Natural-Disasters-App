@@ -3,11 +3,13 @@ from pymongo import MongoClient
 from typing import List
 from BaseAPI import BaseAPI
 from pydantic import BaseModel
+import time
 
 
 class Event_Mod(BaseModel):
     gdacs_id: str
     usgov_id: str
+    last_updated: str = None
 
 
 class Event(BaseAPI):
@@ -29,8 +31,12 @@ class Event(BaseAPI):
 
         for gdac in all_gdacs:
             for usgov in all_usgov:
-                if self.event_macht(gdac, usgov):
-                    event = Event_Mod(gdacs_id=gdac["id"], usgov_id=usgov["id"])
+                if self.event_match(gdac, usgov):
+                    event = Event_Mod(
+                        gdacs_id=gdac["id"],
+                        usgov_id=usgov["id"],
+                        last_updated=time.time(),
+                    )
                     json_event = event.model_dump()
                     logging.info(f"Event matched: {json_event}")
                     result = self._db_db["events"].insert_one(json_event)
