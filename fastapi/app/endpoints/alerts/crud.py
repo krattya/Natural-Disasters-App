@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 
 def get_all_alerts(db) -> List[Any]:
-    return db["events"].find({}, {"_id": 0}).limit(1000)
+    return db["events"].find({}, {"_id": 0}).limit(1000).sort({"last_updated": -1})
 
 
 def get_alert_by_id(alert_id: str, db):
