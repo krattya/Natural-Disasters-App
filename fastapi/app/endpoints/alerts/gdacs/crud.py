@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException, status
 
 
 def get_all_gdacs_alerts(request: Request):
-    return list(request.app.db["gdacs_events"].find({}, {"_id": 0})).limit(1000)
+    return list(request.app.db["gdacs_events"].find({}, {"_id": 0}).limit(1000))
 
 
 def get_gdacs_alert(alert_id_gdac: str, request: Request):
