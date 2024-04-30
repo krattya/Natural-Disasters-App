@@ -5,7 +5,7 @@
 4. Run the following Docker Compose command:
 
 ```
-docker-compose -f .\docker-compose.yaml up -d
+docker-compose -f .\docker-compose.yaml up -d --build
 ```
 5. Find the Docs at http://localhost:8000/docs
 
