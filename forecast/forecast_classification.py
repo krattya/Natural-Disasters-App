@@ -1,4 +1,3 @@
-print("[x] Starting forecast_classification script")
 # %% [markdown]
 # Import Libaries
 
@@ -7,6 +6,8 @@ import pandas as pd
 from sklearn.model_selection import cross_val_score
 from sklearn.tree import DecisionTreeClassifier
 from pymongo import MongoClient
+
+print("[x] Starting forecast_classification script")
 
 # %% [markdown]
 # Reading and format data from the csv file

@@ -1,4 +1,3 @@
-print("[x] Starting forecast script")
 # %% [markdown]
 # Import Libaries
 
@@ -9,6 +8,8 @@ from sklearn.svm import SVR
 from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
 from pymongo import MongoClient
+
+print("[x] Starting forecast script")
 
 # %% [markdown]
 # Read and format data
